@@ -1,5 +1,5 @@
 const CLIENT_ID = 'Ov23ctLHTmsAkhhzX22P';
-const REDIRECT_URI = 'http://localhost:5500';
+const REDIRECT_URI = 'http://127.0.0.1:5500';
 const CLIENT_SECRET = 'c4dc5eaf47130da22eaf5d73115767ef3f5b409f';
 
 let accessToken = localStorage.getItem('accessToken');
