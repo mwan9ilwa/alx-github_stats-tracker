@@ -1,5 +1,5 @@
 const CLIENT_ID = 'Ov23ctLHTmsAkhhzX22P';
-const REDIRECT_URI = 'https://alx-githubstatstracker.netlify.app';
+const REDIRECT_URI = 'https://alx-githubstatstracker.netlify.app/';
 const CLIENT_SECRET = 'c4dc5eaf47130da22eaf5d73115767ef3f5b409f';
 
 let accessToken = localStorage.getItem('accessToken');
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            window.location.href = `https://github.com/login/oauth/authorize?client_id=${CONFIG.CLIENT_ID}&redirect_uri=${CONFIG.REDIRECT_URI}&scope=user,repo`;
+            window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user,repo`;
         });
     } else {
         console.error('Login button not found');
@@ -23,34 +23,41 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const code = urlParams.get('code');
 
     if (code) {
-        // proxy service to handle the token exchange
-        fetch(`https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token`, {
+        fetch('https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                client_id: CONFIG.CLIENT_ID,
-                client_secret: 'CLIENT_SECRET',
-                code: code,
-                redirect_uri: CONFIG.REDIRECT_URI
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET,
+                code: code
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.access_token) {
-                accessToken = data.access_token;
-                localStorage.setItem('accessToken', accessToken);
-                window.history.replaceState({}, document.title, "/"); 
-                loadDashboard();
-            } else {
-                throw new Error('Failed to obtain access token');
+        .then(response => {
+            if (response.status === 403) {
+                throw new Error('403 Forbidden: Access to the resource is denied');
             }
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            return response.json();
+        })
+        .then(data => {
+            accessToken = data.access_token;
+            // Logic to store the access token locally
+            localStorage.setItem('accessToken', accessToken);
+            window.history.replaceState({}, document.title, "/"); 
         })
         .catch(error => {
             console.error('An error occurred:', error);
-            alert('An error occurred during login. Please try again.');
+
+            if (window.location.hostname === 'localhost') {
+                console.error('Detailed error information:', error);
+            } else {
+                alert('An error occurred. Please try again later.');
+            }
         });
     }
 
