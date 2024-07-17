@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user,repo`;
+            window.location.href = `https://github.com/login/oauth/authorize?client_id=${CONFIG.CLIENT_ID}&redirect_uri=${CONFIG.REDIRECT_URI}&scope=user,repo`;
         });
     } else {
         console.error('Login button not found');
@@ -23,41 +23,34 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const code = urlParams.get('code');
 
     if (code) {
-        fetch('https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token', {
+        // proxy service to handle the token exchange
+        fetch(`https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET,
-                code: code
+                client_id: CONFIG.CLIENT_ID,
+                client_secret: 'CLIENT_SECRET_PLACEHOLDER',
+                code: code,
+                redirect_uri: CONFIG.REDIRECT_URI
             })
         })
-        .then(response => {
-            if (response.status === 403) {
-                throw new Error('403 Forbidden: Access to the resource is denied');
-            }
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            accessToken = data.access_token;
-            // Logic to store the access token locally
-            localStorage.setItem('accessToken', accessToken);
-            window.history.replaceState({}, document.title, "/"); 
+            if (data.access_token) {
+                accessToken = data.access_token;
+                localStorage.setItem('accessToken', accessToken);
+                window.history.replaceState({}, document.title, "/"); 
+                loadDashboard();
+            } else {
+                throw new Error('Failed to obtain access token');
+            }
         })
         .catch(error => {
             console.error('An error occurred:', error);
-
-            if (window.location.hostname === 'localhost') {
-                console.error('Detailed error information:', error);
-            } else {
-                alert('An error occurred. Please try again later.');
-            }
+            alert('An error occurred during login. Please try again.');
         });
     }
 
