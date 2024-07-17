@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             },
             body: JSON.stringify({
                 client_id: CONFIG.CLIENT_ID,
-                client_secret: 'CLIENT_SECRET_PLACEHOLDER',
+                client_secret: 'CLIENT_SECRET',
                 code: code,
                 redirect_uri: CONFIG.REDIRECT_URI
             })
