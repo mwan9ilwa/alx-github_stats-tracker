@@ -1,7 +1,7 @@
-GitHub Dashboard Application
+GitHub Stats Tracker Application
 
 Introduction
-GitHub Dashboard is a web application that allows users to visualize their GitHub profile data in an interactive and user-friendly way. This project was developed to help GitHub users better understand their contributions, top languages, and recent activities.
+GitHub Stats Tracker is a web application that allows users to visualize their GitHub profile data in an interactive and user-friendly way. This project was developed to help GitHub users better understand their contributions, top languages, and recent activities.
 
 Team Members:
 
